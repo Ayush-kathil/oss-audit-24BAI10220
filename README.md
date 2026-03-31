@@ -20,17 +20,17 @@ oss-audit-24BAI10220/
 ├── Project_Report.md                      # Comprehensive analysis of OSS principles & Git
 ├── manifesto_ayush_gupta.txt              # Generated user commitment to OSS
 ├── Scripts/                               # Executable Linux Bash utilities
-│   ├── 01_system_identity.sh              
-│   ├── 02_package_inspector.sh
-│   ├── 03_security_auditor.sh
-│   ├── 04_log_analyzer.sh
-│   └── 05_manifesto_generator.sh
+│   ├── script1.sh              
+│   ├── script2.sh
+│   ├── script3.sh
+│   ├── script4.sh
+│   └── script5.sh
 └── screenshots/                           # Proof of execution for each script
-    ├── 01_system_identity.png
-    ├── 02_package_inspector.jpg
-    ├── 03_security_auditor.png
-    ├── 04_log_analyzer.png
-    └── 05_manifesto_generator.jpg
+    ├── script1.png
+    ├── script2.jpg
+    ├── script3.png
+    ├── script4.png
+    └── script5.jpg
 ```
 
 ---
@@ -78,55 +78,55 @@ chmod +x Scripts/*.sh
 
 Each script demonstrates specific Linux command-line capabilities and Bash automation mechanics.
 
-### 1️⃣ System Reconnaissance (`01_system_identity.sh`)
+### 1️⃣ System Reconnaissance (`script1.sh`)
 **Purpose:** Acts as a system fingerprinting tool. Makes system calls to fetch the Linux kernel version, distribution release data, hostname, uptime, and current user metrics.  
 **Demonstrates:** Command substitution `$()`, environment variables, and `echo` formatting.  
 **Execution:**
 ```bash
-./Scripts/01_system_identity.sh
+./Scripts/script1.sh
 ```
-📸 **Output Proof:** [View Screenshot](screenshots/01_system_identity.png)
+📸 **Output Proof:** [View Screenshot](screenshots/script1.png)
 
-### 2️⃣ FOSS Package Inspector (`02_package_inspector.sh`)
+### 2️⃣ FOSS Package Inspector (`script2.sh`)
 **Purpose:** Uses package manager commands (`dpkg`) to formally verify the installation of Git on the host machine. Automatically extracts version numbers and integrates a philosophical assessment based on the package.  
 **Demonstrates:** If-then-else conditionals, `case` statements, package querying (`dpkg`), and piping/filtering.  
 **Execution:**
 ```bash
-./Scripts/02_package_inspector.sh
+./Scripts/script2.sh
 ```
-📸 **Output Proof:** [View Screenshot](screenshots/02_package_inspector.jpg)
+📸 **Output Proof:** [View Screenshot](screenshots/script2.jpg)
 
-### 3️⃣ Security & Resource Auditor (`03_security_auditor.sh`)
+### 3️⃣ Security & Resource Auditor (`script3.sh`)
 **Purpose:** Iterates through critical Linux system layers (`/etc`, `/var/log`, `/home`) reading file permission strings, owner metadata, and disk usage metrics via `du`. Validates that Git repository directories are logically sound.  
 **Demonstrates:** Arrays, `for` loops, `ls -ld`, and string extraction via `awk`.  
 **Execution:**
 ```bash
-./Scripts/03_security_auditor.sh
+./Scripts/script3.sh
 ```
-📸 **Output Proof:** [View Screenshot](screenshots/03_security_auditor.png)
+📸 **Output Proof:** [View Screenshot](screenshots/script3.png)
 
-### 4️⃣ Automated Log Parsing (`04_log_analyzer.sh`)
+### 4️⃣ Automated Log Parsing (`script4.sh`)
 **Purpose:** Scans deep into provided system log files, parsing lines dynamically to find critical keywords ("error" or "failed"). It demonstrates how system administrators actively handle log anomalies.  
 **Demonstrates:** While-read loops, positional command-line arguments (`$1`, `$2`), stateful variables/counters, and file checking.  
 **Execution:**
 *Note: This script requires a log file path as its first argument.*
 ```bash
 # Default keyword 'error'
-./Scripts/04_log_analyzer.sh /var/log/syslog
+./Scripts/script4.sh /var/log/syslog
 
 # Custom argument 'failed'
-./Scripts/04_log_analyzer.sh /var/log/syslog "failed"
+./Scripts/script4.sh /var/log/syslog "failed"
 ```
-📸 **Output Proof:** [View Screenshot](screenshots/04_log_analyzer.png)
+📸 **Output Proof:** [View Screenshot](screenshots/script4.png)
 
-### 5️⃣ The OSS Philosophy Generator (`05_manifesto_generator.sh`)
+### 5️⃣ The OSS Philosophy Generator (`script5.sh`)
 **Purpose:** An interactive, stateful I/O script prompting the user for their thoughts on open source. Captures answers and writes them into a formalized, timestamped text file `manifesto_<username>.txt`.  
 **Demonstrates:** Standard input `read`, string interpolation, and standard output redirection (`>`, `>>`) for permanent file writing.  
 **Execution:**
 ```bash
-./Scripts/05_manifesto_generator.sh
+./Scripts/script5.sh
 ```
-📸 **Output Proof:** [View Screenshot](screenshots/05_manifesto_generator.jpg)
+📸 **Output Proof:** [View Screenshot](screenshots/script5.jpg)
 
 ---
 
