@@ -1,0 +1,12 @@
+------------------------------------------
+ Open Source Manifesto
+------------------------------------------
+Date: 31 March 2026
+
+I believe in the power of open source.
+Using tools like Git, I experience true Independence in technology.
+I believe knowledge should be shared, not restricted.
+In the future, I aim to build Git and make it freely available to everyone.
+This is my contribution to the open-source community.
+
+— ayush_gupta
