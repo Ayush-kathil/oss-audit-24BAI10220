@@ -1,199 +1,448 @@
-# Capstone Project: Open Source Software Audit
+:::: titlepage
+   
 
-**Student Name:** Ayush Gupta  
-**Registration Number:** 24BAI10220  
-**Course:** Open Source Software  
-**Chosen Software:** Git (Version Control System)  
-**Date of Submission:** March 31, 2026  
+::: center
+                        
 
----
+------------------------------------------------------------------------
 
-## Table of Contents
-1. [Introduction](#1-introduction)
-2. [Part A - Origin and Philosophy](#part-a---origin-and-philosophy)
-   - [A1. The Problem Git Was Created to Solve](#a1-the-problem-git-was-created-to-solve)
-   - [A2. The License - What GPL v2 Actually Says](#a2-the-license---what-gpl-v2-actually-says)
-   - [A3. The Ethics of Open Source](#a3-the-ethics-of-open-source)
-3. [Part B - Linux Footprint](#part-b---linux-footprint)
-4. [Part C - The FOSS Ecosystem](#part-c---the-foss-ecosystem)
-5. [Part D - Open Source vs Proprietary](#part-d---open-source-vs-proprietary)
-6. [Shell Script Documentation](#6-shell-script-documentation)
-7. [Conclusion](#7-conclusion)
-8. [References](#8-references)
+\
+        **[Capstone Project Report]{style="color: corporateblue"}**\
+        **Open Source Software Audit & Technical Review**\
+       
 
----
+------------------------------------------------------------------------
 
-## 1. Introduction
-For my capstone project, I decided to audit Git. I didn't want to just write a history report; my goal was to understand how open-source licensing legally protects software, and then practically apply that knowledge by writing automated bash scripts to monitor a Linux environment. Git is the tool that makes modern collaboration on software projects possible. It isn't just a program installed on a developer's machine—it's the exact mechanism by which code history is preserved, shared, and managed safely without a central failure point.
+\
+                 **Submitted by:**\
+        Ayush Gupta\
+                         **Academic Details**\
+                **Registration Number:** 24BAI10220\
+        **Course:** Open Source Software\
+        **Subject Audited:** Git (Version Control System)\
+                                          **Date:** 2026-03-31\
+            
+:::
+::::
 
-This report examines Git from a few different angles: the practical reason Linus Torvalds felt forced to create it, the GPL v2 license that legally protects it, and the moral commitments of the open-source community that sustain it. It also traces how Git physically installs and behaves on a Linux operating system, how it interacts with other free software, and how it directly compares to strict proprietary alternatives. Finally, I document the five shell scripts I wrote to automate system auditing tasks and explain the Linux command-line skills I used to build them.
+# Executive Summary {#executive-summary .unnumbered}
 
----
+For my capstone project, I decided to conduct a deep technical and
+historical audit of open-source software, using Git as my main focus.
+Every computer science student uses version control, but we rarely stop
+to think about how it actually works under the hood. Without tools like
+Git, managing massive global projects---especially the **LINUX
+KERNEL**---would be literally impossible. 
 
-## Part A - Origin and Philosophy
+I structured this report into five main areas of research:
 
-### A1. The Problem Git Was Created to Solve
-Back in the early 2000s, building the Linux kernel was becoming unmanageable. The workflow involved developers sending patches over email, and branch histories were incredibly hard to track. To fix this bottleneck, the kernel project temporarily used a tool called BitKeeper. BitKeeper was ahead of its time because it let each developer keep a complete local copy of the repository instead of relying entirely on one central server. 
+-   **History and Licensing:** I looked into the actual reasons Git was
+    built (which was surprisingly due to a massive argument in the Linux
+    community) and broke down how its GPLv2 license legally protects the
+    software.    
 
-However, BitKeeper had a massive flaw for an open-source project: it was proprietary. The company behind it allowed the Linux community to use it for free, but that free access was a business decision, not a legal right. In 2005, the company revoked that free license over a dispute. Suddenly, the most important software project in the world lost its version control system overnight. 
+-   **System Operations:** I set up a Linux environment to see exactly
+    how Git installs, where it hides its database files, and how it
+    handles user security.    
 
-Linus Torvalds responded to this vulnerability by writing Git from scratch. He had very specific rules in mind: every contributor had to keep the entire history locally on their machine, branching had to occur efficiently without network lag, data corruption had to be mathematically impossible, and above all, the tool had to be open and redistributable. He released it under the GPL v2 license so the community would never be held hostage by a closed-source vendor again.
+-   **Ecosystem Integration:** I explored how Git acts as the middleman
+    in modern tech, specifically how it bridges **Python** code and the
+    **LINUX KERNEL** to automate software deployments.    
 
-### A2. The License - What GPL v2 Actually Says
-Git is legally bound by the GNU General Public License version 2. This license matters because it goes far beyond just saying "this software is free to download." 
+-   **Proprietary Comparison:** To see if open-source is actually
+    better, I compared Git head-to-head with Perforce Helix Core, an
+    expensive paid alternative.    
 
-GPL v2 guarantees specific freedoms: 
-- You can run the software for any reason.
-- You have the absolute right to study the source code and modify it.
-- You can share exact copies of the software with anyone.
-- Most importantly, you can distribute your modified versions—but you must release them under the exact same GPL v2 license.
+-   **Bash Scripting Implementation:** Finally, I wrote five custom
+    shell scripts to prove I can manage Linux resources, find Git
+    databases, and monitor security logs automatically from the
+    terminal.
 
-This last point is called "copyleft." It's incredibly powerful because it stops companies from taking free software, closing the source code, and selling it as a proprietary product. If you build on Git and share it, your additions belong to the public commons too.
+My main takeaway from this project is that open-source isn't just about
+getting software for free; it's about building a safer, more reliable
+foundation for the entire tech industry.
 
-However, just using Git as an everyday tool doesn't trigger this rule. You can write top-secret, proprietary code and store it in Git without any legal issues. The copyleft requirements only kick in if you actually modify the Git program itself and try to release that modified program to the public. 
+------------------------------------------------------------------------
 
-### A3. The Ethics of Open Source
-Open source is largely about shared infrastructure. When you ask if all software should be open source, I think the answer leans heavily toward "yes" for foundation-level tools like operating systems, compilers, and version control systems. If an entire industry relies on a tool, that tool should have a transparent codebase so anyone can fix bugs or audit it for security flaws. We saw exactly what happens during the BitKeeper incident when foundation tools are closed—people lose their ability to work if a vendor changes their mind.
+# Part A --- Origin, Architecture, FOSS Philosophy
 
-Is it ethical for massive tech corporations to profit off open-source code without paying the original maintainers? It's a tough debate. While the licenses explicitly allow commercial use, there is an unspoken ethical rule that if your multi-billion-dollar product relies on a small open-source library, you should probably be financially sponsoring those developers. Git perfectly models how a tool can be shared freely while actively protecting the community from being legally cornered by a corporation.
+## A1. The Problem Space and Cryptographic Solution
 
----
+During my research, what surprised me most was that Git wasn't a planned
+academic project. It was a panic response. In the early 2000s, the
+**LINUX KERNEL** was getting too big. The tools developers used back
+then, like CVS and SVN, were strictly centralized. If you wanted to
+commit code, you had to be connected to the internet and talk directly
+to one main server. It was a massive bottleneck for global teams.
 
-## Part B - Linux Footprint
+Linus Torvalds, the creator of Linux, decided to start using a
+proprietary tool called BitKeeper because it allowed offline work. The
+company behind BitKeeper gave the Linux community a free license.
+However, in 2005, a few open-source developers tried to reverse-engineer
+BitKeeper. The company got angry and immediately revoked the free
+license. Just like that, Linux development came to a screeching halt.
+This situation proved exactly why relying on closed-source tools is so
+dangerous for open-source communities.
 
-Git integrates natively into the Linux operating system. It doesn't require heavy database backends; it just uses the local filesystem.
+Torvalds ended up locking himself away to write his own tool, which he
+named Git. He built it around two core concepts:
 
-### Installing Git
-On Debian and Ubuntu-based systems, you install it natively using the package manager:
-```bash
-sudo apt update
-sudo apt install git -y
+1.  **True Decentralization:** When you clone a repository in Git, you
+    aren't just downloading the current files; you download the entire
+    history. If the central GitHub server goes down, any developer's
+    laptop has a full backup of the project.    
+
+2.  **Data Safety:** Git hashes everything using SHA-1. This means if a
+    file gets corrupted on your hard drive, or if someone tries to
+    secretly inject bad code, the hash will change and Git will throw an
+    error immediately. 
+
+## A2. Legal Mechanics of the GPLv2 License
+
+Git is protected by the GNU General Public License version 2 (GPLv2). I
+read through the license to understand how it works, and it's basically
+a \"copyleft\" agreement.
+
+The GPLv2 gives us four specific freedoms:
+
+-   We can run the program for whatever reason we want.    
+
+-   We can open up the source code, study it, and change it.    
+
+-   We are allowed to share copies with our friends or coworkers.    
+
+-   We can publish our modified versions to the public.
+
+But there is a major catch that makes GPLv2 so powerful. If a big tech
+company takes Git, modifies the code to make it faster, and tries to
+sell it, they are legally forced to release their new code under the
+same GPLv2 license. They can't keep their improvements a secret. 
+
+This is completely different from something like the MIT license, where
+you can take the code, change it, and sell it as a closed product.
+Torvalds picked GPLv2 specifically so that no corporation could ever
+hold Git hostage again.
+
+## A3. The Ethics of Open Source in the Enterprise
+
+In our classes, we often debate if it's fair that huge companies make
+billions of dollars off free software. Today, almost every major company
+runs their servers on the **LINUX KERNEL**, writes their apps in
+**Python**, and tracks all their changes using **Git**. 
+
+At first glance, it looks like corporate exploitation. But the reality I
+found is that it's a mutual relationship. These massive companies are
+actually the ones funding open-source. They hire thousands of developers
+and pay them six-figure salaries just to fix bugs and write new features
+for Linux and Git. 
+
+The coolest part about the open-source model is how it prevents us from
+wasting time. If I want to build a new startup, I don't have to write my
+own programming language or operating system. I can just grab Python,
+Linux, and Git for free, and focus 100% of my energy on writing my
+actual app. 
+
+# Part B --- Linux Footprint & Systems Architecture
+
+To truly understand how Git operates, I decided to audit its behavior
+natively on a Debian 12 Linux machine.
+
+## B1. Package Installation
+
+One of the best things about Git is that you don't need to manually
+compile it from source code. Linux package managers handle everything,
+making it super easy to deploy on a server. I ran the following commands
+to install it:
+
+``` {caption="Standard Git Installation on Debian"}
+# Update the local package list
+sudo apt-get update
+
+# Install git directly from the repository
+sudo apt-get install git -y
 ```
 
-On Fedora or RHEL systems:
-```bash
-sudo dnf install git -y
+While researching, I noticed that Git heavily depends on a few other C
+libraries.
+
+## B2. Where the Files Go (.git)
+
+Most databases run in the background as a service, but Git is completely
+different. It only executes when you type a command. When you run
+`git init` in a folder, it creates a hidden directory called `.git`.
+That single folder is the entire database.
+
+If you look inside the `.git` folder, you'll find:
+
+-   `objects/`: This folder holds all your actual code, compressed into
+    secure little blobs.    
+
+-   `refs/`: This is where Git stores simple text files that point to
+    your branches.    
+
+-   `HEAD`: A file that keeps track of which branch you are currently
+    working on.    
+
+-   `config`: The configuration settings specifically for your current
+    project.
+
+## B3. Security Features
+
+From a security standpoint, Git is very safe to run on a Linux server.
+It runs strictly under your standard user account. It never asks for
+\"root\" privileges. This means if someone finds a vulnerability in Git,
+the hacker can only access your personal project files; they can't break
+into the server's main password files like `/etc/shadow`. Also, Git
+doesn't handle its own network security; it relies entirely on OpenSSH
+when you communicate with remote servers.
+
+# Part C --- The FOSS Ecosystem Integration
+
+Git doesn't exist in a vacuum. In the real world, it's the glue that
+connects different technologies together, especially when it comes to
+automation.
+
+## C1. Connecting Python and Linux
+
+To see how this works in practice, think about a standard web project. A
+developer writes the backend code using **Python** and saves their
+progress with **Git**. When they are finished, they push that code to
+the company's main Linux server.
+
+Because of how Git works, you can set up a \"hook\" (a script) that runs
+the moment the server receives the new code. That script can tell the
+**LINUX KERNEL** to spin up a testing environment and run a bunch of
+Python test scripts. If the Python code works perfectly, Git pushes the
+live website to the public. It completely automates the deployment
+process.
+
+## C2. How Git is Updated
+
+Even though Git is the most popular developer tool on the planet, the
+way they update it is surprisingly old-fashioned. You can't just go to a
+website and click \"Pull Request\" to add code to Git. If you want to
+contribute, you have to write your C code, convert it into a text patch,
+and email it to the official Git mailing list. The core maintainers will
+then reply to your email with critiques. It's a very slow process, but
+it guarantees that only the most heavily scrutinized, high-quality code
+makes it into the official software.
+
+# Part D --- Open Source vs Proprietary 
+
+For my critical analysis, I decided to compare Git against Perforce
+Helix Core, which is a very expensive, proprietary version control
+system used a lot in the video game industry.
+
+  ---------------------- --------------------------------------------------------------------------------- -------------------------------------------------------------------------------------------
+  **Feature**            **Git (Open Source)**                                                             **Perforce (Paid)**
+    **Setup**            Decentralized. Every developer has a full backup on their machine.                Centralized. You have to be connected to the main server to get any work done.
+    **Cost**             100% free. You can scale to 10,000 developers without paying a dime.              Very expensive. You pay a high licensing fee for every single user on your team.
+    **Security Check**   Completely open. Anyone in the world can check the code for vulnerabilities.      Closed source. You have to blindly trust that their internal team wrote secure code.
+    **Handling Files**   Amazing for text and code, but struggles a bit if you have massive video files.   Specifically designed to handle massive, gigabyte-sized binary art files easily.
+    **Data Lock-in**     None. It's very easy to pull your code out of Git if you want to switch tools.    High risk. Once you commit to Perforce, moving your history to another tool is difficult.
+                                                                                                           
+  ---------------------- --------------------------------------------------------------------------------- -------------------------------------------------------------------------------------------
+
+  : Comparing Git and Perforce
+
+## Final Verdict
+
+After looking at the data, Git is clearly the better choice for almost
+every software engineering project out there---whether you're making
+websites, writing Python scripts, or managing Linux servers. It's free,
+it's safer because the community can audit it, and you don't get stuck
+if your internet goes down. The only time I would ever recommend
+Perforce is if I was working at a game studio that needed to manage
+thousands of massive 3D models.
+
+# Part E --- Shell Script Implementation
+
+To prove that I can practically manage these open-source tools on a
+server, I wrote five Bash scripts. These scripts automate checking
+system health, finding Git databases, and monitoring security logs.
+
+## Script 1: System Check
+
+Before running any audits, you need to know what kind of machine you are
+on. This script checks the Linux kernel version, the OS name, and how
+much RAM is currently free.
+
+``` {caption="sys\\_check.sh"}
+#!/bin/bash
+# Checks OS and RAM info on the machine
+
+echo "Starting system check..."
+echo "------------------------"
+
+KERNEL=$(uname -r)
+echo "Kernel: $KERNEL"
+
+OS=$(cat /etc/os-release | grep '^PRETTY_NAME' | cut -d '=' -f 2 | tr -d '"')
+echo "OS: $OS"
+
+RAM=$(free -m | awk 'NR==2{print "Used: "$3"MB, Free: "$4"MB"}')
+echo "Memory: $RAM"
+
+echo "Check complete."
 ```
 
-### Important Git locations on Linux
-Once installed, Git scatters its files across standard Linux directories according to the Filesystem Hierarchy Standard:
-- `/usr/bin/git`: The primary executable binary you run in the terminal.
-- `/usr/lib/git-core/`: Helper scripts and subcommands.
-- `/etc/gitconfig`: The system-wide settings that apply to all users on the computer.
-- `~/.gitconfig`: Your specific user configuration (where your email and name are saved).
+**Example Output:**
 
-When you run `git init` in a folder, Git creates a hidden directory called `.git/`. This folder stores the entire project history, compressed files (blobs), and configuration exact to that specific repository. 
+    Starting system check...
+    ------------------------
+    Kernel: 6.1.0-18-amd64
+    OS: Debian GNU/Linux 12 (bookworm)
+    Memory: Used: 3241MB, Free: 8520MB
+    Check complete.
 
-### Permissions and Security
-Unlike Apache or MySQL, Git does not run as a permanent background service on your OS. It runs strictly as the user who types the command. If I type `git commit`, the process runs with my normal user privileges. This makes Git incredibly secure because it can never accidentally overwrite a file my user account doesn't already have permission to touch.
+## Script 2: Git Folder Finder
 
----
+This script looks at your current directory to see if it is a Git
+repository. If it is, it counts exactly how many files are saved inside
+the hidden database.
 
-## Part C - The FOSS Ecosystem
+``` {caption="git\\_finder.sh"}
+#!/bin/bash
+# Finds the .git directory and counts objects
 
-Git relies on a wide network of other free software to operate. It is written in C, which means it relies on open-source compilers like GCC.
+DIR=${1:-.}
 
-Other dependencies include:
-- `zlib`: Used heavily to compress the snapshot histories inside the `.git` folder so repositories stay small.
-- `libcurl`: Manages network transfers when you push or pull over HTTPS.
-- `OpenSSH`: Secures the entire connection when you push code using SSH keys.
+if [ ! -d "$DIR/.git" ]; then
+    echo "Error: No .git folder found here."
+    exit 1
+fi
 
-Without these pre-existing open-source tools, Torvalds would not have been able to build Git in just a few weeks. 
+echo "Git database found."
+COUNT=$(find "$DIR/.git/objects" -type f | wc -l)
+echo "Total saved items in objects folder: $COUNT"
 
-Git's existence also triggered the creation of entire new software economies. Platforms like GitHub and GitLab essentially put a pretty web interface over Git's command-line functions. Furthermore, modern deployment pipelines (CI/CD) depend entirely on Git. Millions of servers around the world today only update their code when a developer pushes a new Git commit.
-
----
-
-## Part D - Open Source vs Proprietary
-
-To see why Git won the version control war, it helps to compare it directly to a proprietary alternative like Perforce Helix Core.
-
-| Feature Area | Git (GPL v2 Open Source) | Perforce Helix Core (Proprietary) |
-|--------------|--------------------------|------------------------------------|
-| **Cost** | 100% free with no licensing fees exactly because of GPL. | High enterprise per-seat licensing costs. |
-| **Architecture** | Fully decentralized. You have the whole history offline. | Centralized server required. If the server drops, work stops. |
-| **Auditability** | Transparent. Anyone can read the source code to find security bugs. | Closed source black box. You have to blindly trust the vendor. |
-| **Control** | Community-driven. No single company can kill the project. | Corporate-controlled. You must accept their pricing and patch cycles. |
-
-Git is the obvious choice for basically every software development task. The only time proprietary systems like Perforce still hold an edge is in very specific niche industries, like game development, where teams are handling 100GB files of 3D models and textures that Git struggles to compress efficiently. For everything else, the open-source model is faster, safer, and cheaper.
-
----
-
-## 6. Shell Script Documentation
-
-To practically audit a Linux environment hosting open-source tools, I wrote five automated bash scripts. These scripts prove my practical understanding of how to manage a system from the terminal.
-
-### Script 1: System Reconnaissance (`script1.sh`)
-This script pulls basic metadata about the machine environment before any auditing starts.
-- **Concepts used:** Environment variables, command substitution `$(command)`, and basic string formatting.
-- I used `uname -r` to grab the running kernel and `uptime -p` to see how long the server had been running.
-
-**Run Command:**
-```bash
-./Scripts/script1.sh
+SIZE=$(du -sh "$DIR/.git" | awk '{print $1}')
+echo "Total size of .git folder: $SIZE"
 ```
-**Execution Output:**
-![Script 1 Output](screenshots/script1.png)
 
-### Script 2: FOSS Package Inspector (`script2.sh`)
-This script checks the exact installation status of Git by querying the low-level Linux package registry, rather than just assuming the tool works.
-- **Concepts used:** `dpkg` package checking, `if-else` conditionals, and a `case` statement.
-- I used the `case` statement to print a short philosophical note about different open-source packages if the script detects them.
+**Example Output:**
 
-**Run Command:**
-```bash
-./Scripts/script2.sh
+    Git database found.
+    Total saved items in objects folder: 421
+    Total size of .git folder: 12M
+
+## Script 3: Permissions Checker
+
+File permissions are a huge deal in Linux. This script checks a few
+important system files to make sure they aren't accidentally left wide
+open for anyone to edit.
+
+``` {caption="perm\\_check.sh"}
+#!/bin/bash
+# Checks permissions of important security files
+
+echo "Checking file permissions..."
+FILES=("/etc/shadow" "/usr/bin/git" "/var/log/auth.log")
+
+for file in "${FILES[@]}"; do
+    if [ -e "$file" ]; then
+        PERM=$(stat -c "%a" "$file")
+        OWNER=$(stat -c "%U" "$file")
+        echo "$file -> Owner: $OWNER, Permissions: $PERM"
+    else
+        echo "$file -> File missing!"
+    fi
+done
 ```
-**Execution Output:**
-![Script 2 Output](screenshots/script2.jpg)
 
-### Script 3: Security & Resource Auditor (`script3.sh`)
-Since Git relies on local file permissions to stay secure, I wrote this script to investigate core directories and print their sizes and access rights.
-- **Concepts used:** `for` loops through string arrays, extracting columns using `awk`, and silencing terminal errors using standard error redirection `2>/dev/null`.
-- The script looks at `/var/log`, `/etc`, and `/home` and neatly prints the cryptographic permissions (e.g., `drwxr-xr-x`) alongside disk usage calculated by `du -sh`.
+**Example Output:**
 
-**Run Command:**
-```bash
-./Scripts/script3.sh
+    Checking file permissions...
+    /etc/shadow -> Owner: root, Permissions: 640
+    /usr/bin/git -> Owner: root, Permissions: 755
+    /var/log/auth.log -> Owner: root, Permissions: 640
+
+## Script 4: Log Reader
+
+This script reads the Linux security logs to count how many times
+someone failed to log in. This is a great way to spot if a hacker is
+trying to brute-force their way into the server.
+
+``` {caption="log\\_reader.sh"}
+#!/bin/bash
+# Counts failed login attempts in the logs
+
+LOG="/var/log/auth.log"
+
+if [ ! -r "$LOG" ]; then
+    echo "Need sudo to read the log file."
+    exit 1
+fi
+
+FAILS=$(grep -c "Failed password" "$LOG")
+echo "Found $FAILS failed login attempts."
 ```
-**Execution Output:**
-![Script 3 Output](screenshots/script3.png)
 
-### Script 4: Log File Analyzer (`script4.sh`)
-System administrators use log files to find open-source crashes. This script automates scanning large server logs for problems.
-- **Concepts used:** Positional arguments `$1` and `$2`, default variable assignment, and case-insensitive `grep -i` filtering inside a `while read` loop.
-- The script accepts a file path (like `/var/log/syslog`) and slowly increments a counter every time it finds the word "error". It then uses `tail -n 5` to show the admin the last five major faults exactly.
+**Example Output: Found 14 failed login attempts**
 
-**Run Command:**
-```bash
-./Scripts/script4.sh /var/log/syslog
+## Script 5: Git Security Hook
+
+This script automates a bit of security. It creates a Git \"pre-commit\"
+hook that will physically stop a developer from saving their code if
+they accidentally type the word \"PASSWORD\" into their files.
+
+``` {caption="make\\_hook.sh"}
+#!/bin/bash
+# Makes a simple Git hook to block passwords
+
+if [ ! -d ".git/hooks" ]; then
+    echo "Run this inside a Git folder."
+    exit 1
+fi
+
+HOOK=".git/hooks/pre-commit"
+
+cat << 'EOF' > "$HOOK"
+#!/bin/bash
+if git diff --cached | grep -i "PASSWORD"; then
+    echo "Error: You left a password in your code!"
+    exit 1
+fi
+EOF
+
+chmod +x "$HOOK"
+echo "Security hook created successfully."
 ```
-**Execution Output:**
-![Script 4 Output](screenshots/script4.png)
 
-### Script 5: Open Source Manifesto Generator (`script5.sh`)
-For the final script, I wanted to combine automation with user interaction. It prompts the user with questions about open source and writes an actual file to disk.
-- **Concepts used:** Interactive terminal input using `read -p`, string concatenation, and standard output redirection (`>` and `>>`) to permanently create and append to text files.
-- The user's answers are grabbed, timestamped using the `date` command, and safely written into `manifesto_<username>.txt`.
+**Example Output:**
 
-**Run Command:**
-```bash
-./Scripts/script5.sh
-```
-**Execution Output:**
-![Script 5 Output](screenshots/script5.jpg)
+    Security hook created successfully.
 
----
+# Part F --- Conclusion
 
-## 7. Conclusion
-Git was written because the developer community realized how dangerous it was to rely on closed-source software for critical infrastructure. The decision to use GPL v2 wasn't just a casual choice; it was a deliberate legal mechanism designed to keep Git permanently free and publicly accessible. 
+Doing this capstone project completely changed how I look at the
+software I use every day. Open-source isn't just a charity project where
+people give away free code; it's the actual foundation of the modern
+internet. Git's decentralized design solved one of the hardest problems
+in computer science: how to let thousands of people edit the exact same
+files at the same time without ruining each other's work or relying on a
+single expensive server. 
 
-In my view, open source is strongest when people actually contribute back to it, rather than just consuming it for free. This project completely altered how I view the software I use every day. Through writing the five bash scripts, I gained a lot of practical confidence in navigating the Linux filesystem, tracking software packages natively, and managing raw data through the command line without needing a graphical interface. I now understand both the philosophical values and the technical foundation that makes open source the dominant model of software development today.
+Because of the GPLv2 license, we know that Git will always belong to the
+community. The bash scripts I wrote also showed me how easy it is to
+inspect and automate these tools right from the Linux terminal.
+Ultimately, open-source is the safest, most efficient way to build
+technology, and this audit proved exactly why almost every major company
+relies on it today.
 
----
+# References
 
-## 8. References
-- The GNU Project Philosophy: https://www.gnu.org/philosophy/
-- GitHub Documentation & Git Internals
-- Linux Filesystem Hierarchy Standard Documentation
-- GNU Coreutils & Bash Referencing Guides
+1.  **Torvalds, L., & Hamano, J. C.** (2005-Present). *Git
+    Documentation.* Retrieved from <https://git-scm.com/doc>    
+
+2.  **Free Software Foundation.** (1991). *GNU General Public License,
+    version 2.* Retrieved from
+    <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>    
+
+3.  **Linux Foundation.** (n.d.). *The Linux Kernel Archives.*    
+
+4.  **Chacon, S., & Straub, B.** (2014). *Pro Git (2nd Edition).*
+    Apress.    
+
+5.  **Filesystem Hierarchy Standard Group.** (n.d.). *Linux Filesystem
+    Hierarchy Standard.*
