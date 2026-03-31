@@ -1,44 +1,92 @@
-# Open Source Audit Project
+# 🧠 Open Source Audit Project — Git
 
-## Student Details
-- Name: Ayush Gupta
-- Course: Open Source Software
-- Project Title: The Open Source Audit
-
----
-
-## Chosen Software
-Git (Distributed Version Control System)
+## 📌 Student Information
+- **Name:** Ayush Gupta  
+- **Course:** Open Source Software  
+- **Project Type:** Capstone Project (Open Source Audit)  
 
 ---
 
-## Project Overview
-This project focuses on analyzing Git as an open-source software. It explores its origin, licensing, ecosystem, and its role in modern software development. Additionally, the project demonstrates Linux shell scripting through five practical scripts.
+## 🚀 Project Overview
+
+This project presents a structured analysis of **Git**, a distributed version control system and one of the most influential open-source tools in modern software development.
+
+The project explores:
+- The origin and philosophy behind Git  
+- Its licensing model (GPL v2)  
+- Its role in the open-source ecosystem  
+- Practical Linux-based interaction through shell scripting  
 
 ---
 
-## Scripts Description
+## 🔍 Chosen Software: Git
 
-### Script 1: System Identity Report
-Displays system details such as kernel version, user, uptime, and Linux distribution.
-
-### Script 2: FOSS Package Inspector
-Checks whether Git is installed, retrieves version information, and displays package details.
-
-### Script 3: Disk and Permission Auditor
-Analyzes important directories and shows their permissions, ownership, and disk usage.
-
-### Script 4: Log File Analyzer
-Scans system logs and counts occurrences of a specific keyword like "error".
-
-### Script 5: Open Source Manifesto Generator
-Generates a personalized open-source philosophy statement based on user input.
+Git was developed by **Linus Torvalds** in 2005 to manage the development of the Linux kernel. It enables efficient version tracking, collaboration, and distributed development without relying on a central server.
 
 ---
 
-## How to Run
+## 🛠️ Project Components
 
-1. Open Ubuntu (WSL)
-2. Navigate to project folder:
-   ```bash
-   cd oss-audit# oss-audit-24BAI10220
+### 📄 1. Analytical Report (PDF)
+The report covers:
+
+- **Part A:** Origin, License, and Ethics of Open Source  
+- **Part B:** Git in Linux Environment (installation, structure, commands)  
+- **Part C:** Ecosystem and community impact  
+- **Part D:** Comparison with proprietary systems  
+
+---
+
+### 💻 2. Shell Scripts (Linux-Based)
+
+#### 🔹 Script 1: System Identity Report
+Displays system-level information such as:
+- Kernel version  
+- Distribution  
+- Logged-in user  
+- Uptime and system date  
+
+---
+
+#### 🔹 Script 2: FOSS Package Inspector
+- Checks whether Git is installed  
+- Displays version and package details  
+- Uses conditional logic and case statements  
+
+---
+
+#### 🔹 Script 3: Disk and Permission Auditor
+- Analyzes key Linux directories  
+- Displays permissions, ownership, and disk usage  
+- Includes loop and text processing  
+
+---
+
+#### 🔹 Script 4: Log File Analyzer
+- Reads system logs  
+- Counts occurrences of keywords (e.g., "error")  
+- Displays summary and last matching entries  
+
+---
+
+#### 🔹 Script 5: Open Source Manifesto Generator
+- Takes user input  
+- Generates a personalized philosophy statement  
+- Saves output to a `.txt` file  
+
+---
+
+## ⚙️ System Requirements
+
+- Linux Environment (Ubuntu via WSL recommended)  
+- Git installed  
+- Bash shell  
+
+---
+
+## ▶️ How to Run
+
+### Step 1: Clone Repository
+```bash
+git clone https://github.com/Ayush-kathil/oss-audit-24BAI10220.git
+cd oss-audit-24BAI10220
