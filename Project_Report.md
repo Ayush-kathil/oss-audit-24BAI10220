@@ -8,45 +8,37 @@
 ---
 
 ## 1. The Problem Chosen
-The core problem addressed in this Capstone Project is conducting a comprehensive, dual-layered audit of **Git**—the decentralized version control system that serves as the foundation of modern software engineering. 
-
-The task required moving beyond a surface-level definition of "open source." The problem was to theoretically deconstruct how Git's licensing (GPL v2) and architecture (distributed) protect software from proprietary capture, while practically demonstrating how to maintain and audit the Linux environments that host such critical open-source software. To solve the practical side, I developed a suite of five automated Bash shell scripts designed to perform system reconnaissance, package inspection, security auditing, and log analysis.
+For my capstone project, I decided to audit Git. I didn't just want to write a history report on open-source software, though. I wanted to understand how open-source licensing actually protects code, and then practically apply that knowledge by writing automated bash scripts that can monitor the health of a Linux environment running open-source tools. The goal was to bridge the gap between the theory of open source (copyleft licenses, distributed architecture) and the actual command-line work required to maintain these systems.
 
 ## 2. Why This Problem Matters
-Understanding the foundations of open-source software is an ethical and technical imperative for modern developers. 
+Before 2005, the Linux kernel team actually used a proprietary tool called BitKeeper for their version control. The company behind BitKeeper offered a free license to the community, but eventually revoked it over a dispute. Suddenly, the biggest open-source project in the world lost its version control system overnight. This event is a massive lesson: if the tools we use to build free software aren't open source themselves, the community can be held hostage by a single vendor. 
 
-**The Historical Context:** Prior to 2005, the Linux kernel was managed via a proprietary version control system called BitKeeper. When the vendor abruptly revoked the "free" license they had extended to the Linux community, development of the world's most critical operating system ground to a halt. Linus Torvalds engineered Git as a direct response to this crisis. By auditing Git, we are examining a tool forged explicitly to ensure that open-source communities are never held hostage by proprietary vendors again.
+That's why Linus Torvalds built Git. He distributed it under the GPL v2 license. This license is "copyleft"—meaning anyone who modifies and distributes Git has to also release their modifications under the exact same open license. Understanding this matters because traditional copyright law restricts sharing, but GPL v2 uses that same legal framework to guarantee that the code stays publicly available forever. 
 
-**The Licensing Imperative:** Git is licensed under the GNU General Public License version 2 (GPLv2). This is a "copyleft" license. If a corporation modifies Git and distributes it, GPLv2 legally mandates that they must release those modifications under the same free license. Auditing this ensures we understand how traditional copyright law is weaponized to keep software permanently in the public commons. 
-
-From a system administration perspective, auditing matters because open-source tools do not run in a vacuum. Git relies on the Linux OS, OpenSSH for secure transport, and `zlib` for data compression. Automating the health checks of the Linux environment (via Bash scripting) is critical because the security of Git repositories depends entirely on the file permissions of the host machine.
+From a system administration perspective, this project matters because tools like Git rely heavily on the Linux operating system. Automating Linux health checks via bash scripting is a required skill to ensure these open-source tools are running smoothly and securely.
 
 ## 3. Approach to Solving the Problem
-My approach was divided into theoretical research and practical execution.
+My approach was split into two parts: research and scripting. 
 
-**Theoretical Research:** I analyzed the architectural differences between centralized proprietary systems (like SVN or Perforce) and decentralized OSS systems (like Git). I explored how decentralized models democratize data ownership by providing every developer with a full, cryptographic clone of the repository history.
+First, I researched how decentralized systems like Git physically differ from older centralized systems like Subversion (SVN) or Perforce. I focused on how decentralization gives every developer a full backup of a project, removing single points of failure.
 
-**Practical Execution (Bash Automation):** To practically audit the Linux environment hosting these open-source tools, I engineered five POSIX-compliant Bash scripts. My approach was to use standard GNU core utilities (`awk`, `grep`, `du`, `uname`) to build tools that interact naturally with the Linux Filesystem Hierarchy Standard (FHS). 
-- I built a `System Reconnaissance` script to capture the baseline kernel and distribution.
-- I built a `Package Inspector` to proactively query the package manager (`dpkg`) to verify Git's installation.
-- I built a `Security Auditor` to traverse directory trees and calculate storage and permission string integrity.
+For the practical portion, I logged into a Linux terminal and wrote five custom Bash shell scripts. Instead of just searching for the word "git" randomly, I structured my scripts to use standard Linux utilities (like `dpkg`, `awk`, `grep`, and `du`). The goal was to automate tasks like checking system distribution, querying package managers for exact installation status, calculating file permissions around critical directories, and filtering server logs for errors.
 
 ## 4. Key Technical Decisions
-Several critical decisions shaped the architecture of my Bash auditing toolkit:
-1. **Avoiding Root Privileges:** I deliberately designed the scripts to run without `sudo` access where possible. Open-source environments prioritize the principle of least privilege. My scripts gracefully handle permission-denied errors (e.g., routing errors to `/dev/null`) rather than crashing when they hit a protected system directory.
-2. **Dynamic Package Management Checking:** Rather than just looking for an executable, I decided to use `dpkg` to query the Deb-based package registry. This decision ensures I get the formal installation status, exact versioning, and repository metadata, which is much more robust than simply running `git --version`.
-3. **Interactive Manifesto Generation:** For the final script, I made the key decision to use interactive terminal input (`read -p`). Instead of just dumping data, this captures the user's personal ideology regarding open source and programmatically writes it to a `.txt` manifesto, bridging technical automation with the human element of FOSS.
+I had to make a few design choices while writing the bash toolkit:
+- **Avoiding root access:** I designed the disk and permission scripts to run without `sudo`. Open-source security relies on strict permissions, so I wanted my scripts to handle restricted directories cleanly without crashing or requiring top-level access.
+- **Using dpkg:** In the package inspector script, I chose to query `dpkg` directly rather than just running `git --version`. This ensures I get the real deb-package installation status and metadata straight from the OS layer.
+- **Making it interactive:** For the manifesto generator, I decided to use `read -p` to take keyboard input. I felt the project needed a human element, so rather than just printing static text, the script prompts the user about their open-source philosophy and generates a custom `.txt` file automatically based on their answers.
 
 ## 5. Challenges Faced During Implementation
-1. **Handling Unpredictable Log Formatting:** While writing the *Automated Log Parsing* script, I realized system logs (`/var/log/syslog`) are dense and inconsistently formatted. *Challenge:* How do I accurately find application faults? *Solution:* I implemented a case-insensitive reading loop (`grep -iq`) combined with dynamic positional parameters (`$1` and `${2:-"error"}`), allowing the administrator to filter for generic anomalies gracefully without needing complex Regex patterns.
-2. **Graceful Error Handling with Storage:** When auditing directory sizes using `du -sh` on system directories like `/var/log` without root privileges, the terminal was flooded with "Permission denied" errors, ruining the script's output. *Solution:* I utilized standard error redirection (`2>/dev/null`) to silence these specific warnings, allowing the script to report valid sizes for accessible data while remaining visually clean in the console.
+Writing the log analysis script highlighted how messy system logs can be. When scanning `/var/log/syslog`, I initially struggled to pull out relevant failures without capturing too much random system noise. I solved this by implementing a case-insensitive `grep -iq` check inside a `while read` loop, and allowed the script to accept custom keywords via command-line arguments (defaulting to "error"). 
+
+Another annoying issue came up during the directory audit. Running `du -sh` on restricted folders like `/var/log` threw a lot of messy permission errors onto my screen. I learned to use `2>/dev/null` to quietly dump those specific errors, which kept the final output table completely clean and readable on the console.
 
 ## 6. What I Learned
-Through this Capstone, I gained a profound understanding of both the ideology and infrastructure of open-source development. 
-- **Ideologically:** I learned that "free software" (as in freedom, not free beer) is paramount. I understand how copyleft licenses protect user rights, and how platforms like GitHub were only made possible because the underlying Git protocol was open and distributed.
-- **Technically:** My Linux command-line proficiency increased immensely. I learned how to weave `awk` and `grep` pipelines inside loops to extract precise metadata. I learned how Linux manages file permissions cryptographically (`drwxr-xr-x`), and how bash scripts can manipulate standard input/output streams to automate system-level health verification. 
+This project gave me a much clearer picture of how dependent we are on open-source foundations. I learned that Git is basically a massive puzzle of other free tools—it uses `zlib` to compress data and `OpenSSH` to securely transfer code over the network. 
 
-This project reinforced that open source is human collaboration compounded by technology, and maintaining that technology requires capable automation.
+On the coding side, my comfort level with the Linux command line improved significantly. I learned how to use `awk` to extract exact columns from `ls -ld` outputs, how to manage variables inside bash scripts, and how file permissions (`drwxr-xr-x`) physically secure a system. Overall, this audit taught me that open source isn't just about sharing code out of generosity; it's an incredibly technical and legally protected development model capable of producing the best software in the world.
 
 ---
 
