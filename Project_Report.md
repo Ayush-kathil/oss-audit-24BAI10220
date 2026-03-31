@@ -1,139 +1,199 @@
 # Capstone Project: Open Source Software Audit
+
 **Student Name:** Ayush Gupta  
 **Registration Number:** 24BAI10220  
 **Course:** Open Source Software  
-**Subject Audited:** Git (Version Control System)  
-**License:** GNU General Public License v2 (GPL v2)  
+**Chosen Software:** Git (Version Control System)  
+**Date of Submission:** March 31, 2026  
 
 ---
 
-## 1. The Problem Chosen
-For my capstone project, I decided to audit Git. I didn't just want to write a history report on open-source software, though. I wanted to understand how open-source licensing actually protects code, and then practically apply that knowledge by writing automated bash scripts that can monitor the health of a Linux environment running open-source tools. The goal was to bridge the gap between the theory of open source (copyleft licenses, distributed architecture) and the actual command-line work required to maintain these systems.
-
-## 2. Why This Problem Matters
-Before 2005, the Linux kernel team actually used a proprietary tool called BitKeeper for their version control. The company behind BitKeeper offered a free license to the community, but eventually revoked it over a dispute. Suddenly, the biggest open-source project in the world lost its version control system overnight. This event is a massive lesson: if the tools we use to build free software aren't open source themselves, the community can be held hostage by a single vendor. 
-
-That's why Linus Torvalds built Git. He distributed it under the GPL v2 license. This license is "copyleft"—meaning anyone who modifies and distributes Git has to also release their modifications under the exact same open license. Understanding this matters because traditional copyright law restricts sharing, but GPL v2 uses that same legal framework to guarantee that the code stays publicly available forever. 
-
-From a system administration perspective, this project matters because tools like Git rely heavily on the Linux operating system. Automating Linux health checks via bash scripting is a required skill to ensure these open-source tools are running smoothly and securely.
-
-## 3. Approach to Solving the Problem
-My approach was split into two parts: research and scripting. 
-
-First, I researched how decentralized systems like Git physically differ from older centralized systems like Subversion (SVN) or Perforce. I focused on how decentralization gives every developer a full backup of a project, removing single points of failure.
-
-For the practical portion, I logged into a Linux terminal and wrote five custom Bash shell scripts. Instead of just searching for the word "git" randomly, I structured my scripts to use standard Linux utilities (like `dpkg`, `awk`, `grep`, and `du`). The goal was to automate tasks like checking system distribution, querying package managers for exact installation status, calculating file permissions around critical directories, and filtering server logs for errors.
-
-## 4. Key Technical Decisions
-I had to make a few design choices while writing the bash toolkit:
-- **Avoiding root access:** I designed the disk and permission scripts to run without `sudo`. Open-source security relies on strict permissions, so I wanted my scripts to handle restricted directories cleanly without crashing or requiring top-level access.
-- **Using dpkg:** In the package inspector script, I chose to query `dpkg` directly rather than just running `git --version`. This ensures I get the real deb-package installation status and metadata straight from the OS layer.
-- **Making it interactive:** For the manifesto generator, I decided to use `read -p` to take keyboard input. I felt the project needed a human element, so rather than just printing static text, the script prompts the user about their open-source philosophy and generates a custom `.txt` file automatically based on their answers.
-
-## 5. Challenges Faced During Implementation
-Writing the log analysis script highlighted how messy system logs can be. When scanning `/var/log/syslog`, I initially struggled to pull out relevant failures without capturing too much random system noise. I solved this by implementing a case-insensitive `grep -iq` check inside a `while read` loop, and allowed the script to accept custom keywords via command-line arguments (defaulting to "error"). 
-
-Another annoying issue came up during the directory audit. Running `du -sh` on restricted folders like `/var/log` threw a lot of messy permission errors onto my screen. I learned to use `2>/dev/null` to quietly dump those specific errors, which kept the final output table completely clean and readable on the console.
-
-## 6. What I Learned
-This project gave me a much clearer picture of how dependent we are on open-source foundations. I learned that Git is basically a massive puzzle of other free tools—it uses `zlib` to compress data and `OpenSSH` to securely transfer code over the network. 
-
-On the coding side, my comfort level with the Linux command line improved significantly. I learned how to use `awk` to extract exact columns from `ls -ld` outputs, how to manage variables inside bash scripts, and how file permissions (`drwxr-xr-x`) physically secure a system. Overall, this audit taught me that open source isn't just about sharing code out of generosity; it's an incredibly technical and legally protected development model capable of producing the best software in the world.
+## Table of Contents
+1. [Introduction](#1-introduction)
+2. [Part A - Origin and Philosophy](#part-a---origin-and-philosophy)
+   - [A1. The Problem Git Was Created to Solve](#a1-the-problem-git-was-created-to-solve)
+   - [A2. The License - What GPL v2 Actually Says](#a2-the-license---what-gpl-v2-actually-says)
+   - [A3. The Ethics of Open Source](#a3-the-ethics-of-open-source)
+3. [Part B - Linux Footprint](#part-b---linux-footprint)
+4. [Part C - The FOSS Ecosystem](#part-c---the-foss-ecosystem)
+5. [Part D - Open Source vs Proprietary](#part-d---open-source-vs-proprietary)
+6. [Shell Script Documentation](#6-shell-script-documentation)
+7. [Conclusion](#7-conclusion)
+8. [References](#8-references)
 
 ---
 
-## 7. Appendix: Practical Bash Automation Toolkit
-*Below is the documented source code from the five Bash scripts evaluated during the practical portion of this audit.*
+## 1. Introduction
+For my capstone project, I decided to audit Git. I didn't want to just write a history report; my goal was to understand how open-source licensing legally protects software, and then practically apply that knowledge by writing automated bash scripts to monitor a Linux environment. Git is the tool that makes modern collaboration on software projects possible. It isn't just a program installed on a developer's machine—it's the exact mechanism by which code history is preserved, shared, and managed safely without a central failure point.
+
+This report examines Git from a few different angles: the practical reason Linus Torvalds felt forced to create it, the GPL v2 license that legally protects it, and the moral commitments of the open-source community that sustain it. It also traces how Git physically installs and behaves on a Linux operating system, how it interacts with other free software, and how it directly compares to strict proprietary alternatives. Finally, I document the five shell scripts I wrote to automate system auditing tasks and explain the Linux command-line skills I used to build them.
+
+---
+
+## Part A - Origin and Philosophy
+
+### A1. The Problem Git Was Created to Solve
+Back in the early 2000s, building the Linux kernel was becoming unmanageable. The workflow involved developers sending patches over email, and branch histories were incredibly hard to track. To fix this bottleneck, the kernel project temporarily used a tool called BitKeeper. BitKeeper was ahead of its time because it let each developer keep a complete local copy of the repository instead of relying entirely on one central server. 
+
+However, BitKeeper had a massive flaw for an open-source project: it was proprietary. The company behind it allowed the Linux community to use it for free, but that free access was a business decision, not a legal right. In 2005, the company revoked that free license over a dispute. Suddenly, the most important software project in the world lost its version control system overnight. 
+
+Linus Torvalds responded to this vulnerability by writing Git from scratch. He had very specific rules in mind: every contributor had to keep the entire history locally on their machine, branching had to occur efficiently without network lag, data corruption had to be mathematically impossible, and above all, the tool had to be open and redistributable. He released it under the GPL v2 license so the community would never be held hostage by a closed-source vendor again.
+
+### A2. The License - What GPL v2 Actually Says
+Git is legally bound by the GNU General Public License version 2. This license matters because it goes far beyond just saying "this software is free to download." 
+
+GPL v2 guarantees specific freedoms: 
+- You can run the software for any reason.
+- You have the absolute right to study the source code and modify it.
+- You can share exact copies of the software with anyone.
+- Most importantly, you can distribute your modified versions—but you must release them under the exact same GPL v2 license.
+
+This last point is called "copyleft." It's incredibly powerful because it stops companies from taking free software, closing the source code, and selling it as a proprietary product. If you build on Git and share it, your additions belong to the public commons too.
+
+However, just using Git as an everyday tool doesn't trigger this rule. You can write top-secret, proprietary code and store it in Git without any legal issues. The copyleft requirements only kick in if you actually modify the Git program itself and try to release that modified program to the public. 
+
+### A3. The Ethics of Open Source
+Open source is largely about shared infrastructure. When you ask if all software should be open source, I think the answer leans heavily toward "yes" for foundation-level tools like operating systems, compilers, and version control systems. If an entire industry relies on a tool, that tool should have a transparent codebase so anyone can fix bugs or audit it for security flaws. We saw exactly what happens during the BitKeeper incident when foundation tools are closed—people lose their ability to work if a vendor changes their mind.
+
+Is it ethical for massive tech corporations to profit off open-source code without paying the original maintainers? It's a tough debate. While the licenses explicitly allow commercial use, there is an unspoken ethical rule that if your multi-billion-dollar product relies on a small open-source library, you should probably be financially sponsoring those developers. Git perfectly models how a tool can be shared freely while actively protecting the community from being legally cornered by a corporation.
+
+---
+
+## Part B - Linux Footprint
+
+Git integrates natively into the Linux operating system. It doesn't require heavy database backends; it just uses the local filesystem.
+
+### Installing Git
+On Debian and Ubuntu-based systems, you install it natively using the package manager:
+```bash
+sudo apt update
+sudo apt install git -y
+```
+
+On Fedora or RHEL systems:
+```bash
+sudo dnf install git -y
+```
+
+### Important Git locations on Linux
+Once installed, Git scatters its files across standard Linux directories according to the Filesystem Hierarchy Standard:
+- `/usr/bin/git`: The primary executable binary you run in the terminal.
+- `/usr/lib/git-core/`: Helper scripts and subcommands.
+- `/etc/gitconfig`: The system-wide settings that apply to all users on the computer.
+- `~/.gitconfig`: Your specific user configuration (where your email and name are saved).
+
+When you run `git init` in a folder, Git creates a hidden directory called `.git/`. This folder stores the entire project history, compressed files (blobs), and configuration exact to that specific repository. 
+
+### Permissions and Security
+Unlike Apache or MySQL, Git does not run as a permanent background service on your OS. It runs strictly as the user who types the command. If I type `git commit`, the process runs with my normal user privileges. This makes Git incredibly secure because it can never accidentally overwrite a file my user account doesn't already have permission to touch.
+
+---
+
+## Part C - The FOSS Ecosystem
+
+Git relies on a wide network of other free software to operate. It is written in C, which means it relies on open-source compilers like GCC.
+
+Other dependencies include:
+- `zlib`: Used heavily to compress the snapshot histories inside the `.git` folder so repositories stay small.
+- `libcurl`: Manages network transfers when you push or pull over HTTPS.
+- `OpenSSH`: Secures the entire connection when you push code using SSH keys.
+
+Without these pre-existing open-source tools, Torvalds would not have been able to build Git in just a few weeks. 
+
+Git's existence also triggered the creation of entire new software economies. Platforms like GitHub and GitLab essentially put a pretty web interface over Git's command-line functions. Furthermore, modern deployment pipelines (CI/CD) depend entirely on Git. Millions of servers around the world today only update their code when a developer pushes a new Git commit.
+
+---
+
+## Part D - Open Source vs Proprietary
+
+To see why Git won the version control war, it helps to compare it directly to a proprietary alternative like Perforce Helix Core.
+
+| Feature Area | Git (GPL v2 Open Source) | Perforce Helix Core (Proprietary) |
+|--------------|--------------------------|------------------------------------|
+| **Cost** | 100% free with no licensing fees exactly because of GPL. | High enterprise per-seat licensing costs. |
+| **Architecture** | Fully decentralized. You have the whole history offline. | Centralized server required. If the server drops, work stops. |
+| **Auditability** | Transparent. Anyone can read the source code to find security bugs. | Closed source black box. You have to blindly trust the vendor. |
+| **Control** | Community-driven. No single company can kill the project. | Corporate-controlled. You must accept their pricing and patch cycles. |
+
+Git is the obvious choice for basically every software development task. The only time proprietary systems like Perforce still hold an edge is in very specific niche industries, like game development, where teams are handling 100GB files of 3D models and textures that Git struggles to compress efficiently. For everything else, the open-source model is faster, safer, and cheaper.
+
+---
+
+## 6. Shell Script Documentation
+
+To practically audit a Linux environment hosting open-source tools, I wrote five automated bash scripts. These scripts prove my practical understanding of how to manage a system from the terminal.
 
 ### Script 1: System Reconnaissance (`script1.sh`)
+This script pulls basic metadata about the machine environment before any auditing starts.
+- **Concepts used:** Environment variables, command substitution `$(command)`, and basic string formatting.
+- I used `uname -r` to grab the running kernel and `uptime -p` to see how long the server had been running.
+
+**Run Command:**
 ```bash
-#!/bin/bash
-# --- Variables ---
-STUDENT_NAME="Ayush"
-SOFTWARE_CHOICE="Git"
-
-# --- System Info ---
-KERNEL=$(uname -r)
-USER_NAME=$(whoami)
-UPTIME=$(uptime -p)
-DATE=$(date)
-DISTRO=$(lsb_release -d | cut -f2)
-
-# --- Display ---
-echo "=========================================="
-echo " Open Source Audit — $STUDENT_NAME"
-# ... (Formatting commands) ...
-echo "License Note    : Linux is distributed under the GNU General Public License (GPL)"
+./Scripts/script1.sh
 ```
+**Execution Output:**
+![Script 1 Output](screenshots/script1.png)
 
 ### Script 2: FOSS Package Inspector (`script2.sh`)
-```bash
-#!/bin/bash
-PACKAGE="git"
-# --- Check if package is installed ---
-if dpkg -l | grep -qw "$PACKAGE"; then
-    echo "$PACKAGE is installed on this system."
-    VERSION=$(git --version | awk '{print $3}')
-    echo "Version: $VERSION"
-    dpkg -s $PACKAGE | grep -E 'Status|Priority|Section'
-else
-    echo "$PACKAGE is NOT installed."
-fi
+This script checks the exact installation status of Git by querying the low-level Linux package registry, rather than just assuming the tool works.
+- **Concepts used:** `dpkg` package checking, `if-else` conditionals, and a `case` statement.
+- I used the `case` statement to print a short philosophical note about different open-source packages if the script detects them.
 
-# ... case statement mapping packages (git, apache2, firefox) to philosophy notes ...
+**Run Command:**
+```bash
+./Scripts/script2.sh
 ```
+**Execution Output:**
+![Script 2 Output](screenshots/script2.jpg)
 
 ### Script 3: Security & Resource Auditor (`script3.sh`)
+Since Git relies on local file permissions to stay secure, I wrote this script to investigate core directories and print their sizes and access rights.
+- **Concepts used:** `for` loops through string arrays, extracting columns using `awk`, and silencing terminal errors using standard error redirection `2>/dev/null`.
+- The script looks at `/var/log`, `/etc`, and `/home` and neatly prints the cryptographic permissions (e.g., `drwxr-xr-x`) alongside disk usage calculated by `du -sh`.
+
+**Run Command:**
 ```bash
-#!/bin/bash
-DIRS=("/etc" "/var/log" "/home" "/usr/bin" "/tmp")
-
-# --- Loop through directories ---
-for DIR in "${DIRS[@]}"; do
-    if [ -d "$DIR" ]; then
-        PERMS=$(ls -ld $DIR | awk '{print $1}')
-        OWNER=$(ls -ld $DIR | awk '{print $3}')
-        GROUP=$(ls -ld $DIR | awk '{print $4}')
-        SIZE=$(du -sh $DIR 2>/dev/null | cut -f1)
-        # ... echo outputs ...
-    fi
-done
-# ... Additional validation targeting the ~/.gitconfig file permissions ...
+./Scripts/script3.sh
 ```
+**Execution Output:**
+![Script 3 Output](screenshots/script3.png)
 
-### Script 4: Automated Log Parsing (`script4.sh`)
+### Script 4: Log File Analyzer (`script4.sh`)
+System administrators use log files to find open-source crashes. This script automates scanning large server logs for problems.
+- **Concepts used:** Positional arguments `$1` and `$2`, default variable assignment, and case-insensitive `grep -i` filtering inside a `while read` loop.
+- The script accepts a file path (like `/var/log/syslog`) and slowly increments a counter every time it finds the word "error". It then uses `tail -n 5` to show the admin the last five major faults exactly.
+
+**Run Command:**
 ```bash
-#!/bin/bash
-LOGFILE=$1
-KEYWORD=${2:-"error"}   # Default keyword = error
-COUNT=0
-
-# ... validation logic ...
-while IFS= read -r LINE; do
-    if echo "$LINE" | grep -iq "$KEYWORD"; then
-        COUNT=$((COUNT + 1))
-    fi
-done < "$LOGFILE"
-
-echo "Keyword '$KEYWORD' found $COUNT times in $LOGFILE"
-grep -i "$KEYWORD" "$LOGFILE" | tail -n 5
+./Scripts/script4.sh /var/log/syslog
 ```
+**Execution Output:**
+![Script 4 Output](screenshots/script4.png)
 
-### Script 5: The OSS Philosophy Generator (`script5.sh`)
+### Script 5: Open Source Manifesto Generator (`script5.sh`)
+For the final script, I wanted to combine automation with user interaction. It prompts the user with questions about open source and writes an actual file to disk.
+- **Concepts used:** Interactive terminal input using `read -p`, string concatenation, and standard output redirection (`>` and `>>`) to permanently create and append to text files.
+- The user's answers are grabbed, timestamped using the `date` command, and safely written into `manifesto_<username>.txt`.
+
+**Run Command:**
 ```bash
-#!/bin/bash
-read -p "1. Name one open-source tool you use every day: " TOOL
-read -p "2. In one word, what does 'freedom' mean to you? " FREEDOM
-read -p "3. Name one thing you would build and share freely: " BUILD
-
-DATE=$(date '+%d %B %Y')
-USER=$(whoami)
-OUTPUT="manifesto_$USER.txt"
-
-# --- Generate manifesto ---
-echo "------------------------------------------" > $OUTPUT
-echo " Open Source Manifesto" >> $OUTPUT
-echo "Date: $DATE" >> $OUTPUT
-echo "Using tools like $TOOL, I experience true $FREEDOM in technology." >> $OUTPUT
-# ... prints final output ...
+./Scripts/script5.sh
 ```
+**Execution Output:**
+![Script 5 Output](screenshots/script5.jpg)
+
+---
+
+## 7. Conclusion
+Git was written because the developer community realized how dangerous it was to rely on closed-source software for critical infrastructure. The decision to use GPL v2 wasn't just a casual choice; it was a deliberate legal mechanism designed to keep Git permanently free and publicly accessible. 
+
+In my view, open source is strongest when people actually contribute back to it, rather than just consuming it for free. This project completely altered how I view the software I use every day. Through writing the five bash scripts, I gained a lot of practical confidence in navigating the Linux filesystem, tracking software packages natively, and managing raw data through the command line without needing a graphical interface. I now understand both the philosophical values and the technical foundation that makes open source the dominant model of software development today.
+
+---
+
+## 8. References
+- The GNU Project Philosophy: https://www.gnu.org/philosophy/
+- GitHub Documentation & Git Internals
+- Linux Filesystem Hierarchy Standard Documentation
+- GNU Coreutils & Bash Referencing Guides
