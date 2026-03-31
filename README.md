@@ -1,78 +1,89 @@
-# 🚀 Open Source Software Audit: Unpacking Git
+# Open Source Software Audit & Bash Automation Toolkit
 
-![Bash Scripting](https://img.shields.io/badge/Language-Bash_Scripting-4EAA25?style=for-the-badge&logo=gnu-bash&logoColor=white)
-![Platform Linux](https://img.shields.io/badge/Platform-Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
-![License GPLv2](https://img.shields.io/badge/License-GPL_v2-blue?style=for-the-badge)
-![Status](https://img.shields.io/badge/Project_Status-Active-success?style=for-the-badge)
+## 📌 Project Overview
+This repository contains a technical and philosophical audit of **Git**, serving as a comprehensive exploration of open-source principles, licensing, and system-level operations. It bridges theoretical open-source concepts with practical Linux environment management through a series of automated Bash scripts.
 
-A comprehensive analytical report and interactive Bash toolkit designed to explore the architecture, licensing, and system-level operations of **Git** within a Linux ecosystem.
-
----
-
-## 👨‍💻 Author Information
-- **Name:** Ayush Gupta
-- **Registration Number:** 24BAI10220
-- **Course:** Open Source Software
-- **Deliverable:** Capstone Project (Open Source Audit)
+**Author:** Ayush Gupta  
+**Registration Number:** 24BAI10220  
+**Course:** Open Source Software  
+**Deliverable:** Capstone Project (Open Source Audit)
 
 ---
 
-## 📖 Project Overview & Philosophy
+## 🛠️ Repository Structure
+```text
+oss-audit-24BAI10220/
+├── README.md                 # You are here
+├── Project_Report.md         # Comprehensive analysis of OSS principles & Git
+├── manifesto_ayush_gupta.txt # Generated user commitment to OSS
+└── Scripts/
+    ├── script1.sh            # System Identity Report
+    ├── script2.sh            # FOSS Package Inspector
+    ├── script3.sh            # Disk and Permission Auditor
+    ├── script4.sh            # Log File Analyzer
+    └── script5.sh            # Open Source Manifesto Generator
+```
 
-The open-source ecosystem thrives on transparency, community collaboration, and robust tooling. This project serves as a technical and philosophical audit of **Git**—the undisputed backbone of modern version control. 
+## ⚙️ Execution Guide & Script Analysis
 
-Rather than just summarizing what Git does, this project bridges the gap between **theory** (licensing, ethics, and community impact) and **practice** (interacting with the Linux environment via shell scripting to monitor system health, packages, and permissions).
-
-### 🎯 Core Objectives:
-1. **Analyze** the origin, GPL v2 licensing model, and ethical foundations of Git.
-2. **Demonstrate** practical Linux environment management using automated Bash scripts.
-3. **Compare** distributed version control (Git) against proprietary, centralized models.
-
----
-
-## 🧠 Why Git? (The Chosen Software)
-
-Created by Linus Torvalds in 2005 to manage the massive Linux kernel project, Git revolutionized software development. 
-* **Distributed Architecture:** Unlike SVN, every developer has a full backup of the repository history.
-* **Performance:** Optimized for branching and merging, treating data like a stream of snapshots.
-* **Open Source Impact:** Git powers platforms like GitHub and GitLab, serving as the foundational layer for global open-source contributions.
-
----
-
-## 💻 Technical Architecture: Understanding the Scripts
-
-The practical component of this audit consists of five Bash scripts. Here is an explanation of what each script is actually doing under the hood:
-
-### 1️⃣ `script1.sh` | System Reconnaissance
-* **What it does:** Acts as a system fingerprinting tool. It makes system calls to fetch the Linux kernel version, distribution release data, and current user metrics.
-* **Why it matters:** In an open-source audit, knowing the exact environment you are operating in is crucial for reproducibility and debugging.
-
-### 2️⃣ `script2.sh` | FOSS Package Inspector
-* **What it does:** Uses conditional logic (`if/else`) and package manager commands to hunt for the Git binary. It extracts the version and verifies its installation path.
-* **Why it matters:** Automates dependency checking. Before auditing a software, you must mathematically verify its presence and state on the host machine.
-
-### 3️⃣ `script3.sh` | Security & Resource Auditor
-* **What it does:** Iterates through specific directories using `for` loops to read file permission strings (e.g., `rwxr-xr-x`), owner data, and disk usage (`du`).
-* **Why it matters:** Git repositories manage source code. Understanding directory permissions is vital to ensure that open-source code is secure from unauthorized local modifications.
-
-### 4️⃣ `script4.sh` | Automated Log Parsing
-* **What it does:** Uses tools like `grep` and `awk` to scan deep into `/var/log/syslog` or `/var/log/messages`, filtering out the noise to find critical keywords like "error" or "failed".
-* **Why it matters:** System administrators rely on logs to maintain health. This script demonstrates how open-source OS environments handle error tracking.
-
-### 5️⃣ `script5.sh` | The OSS Philosophy Generator
-* **What it does:** An interactive I/O script. It prompts the user for their thoughts on open source, captures the variables, and writes them permanently into a text file (`manifesto_ayush_gupta.txt`).
-* **Why it matters:** Highlights the human element of FOSS (Free and Open Source Software), allowing developers to document their personal commitment to the community.
-
----
-
-## ⚙️ Execution Guide
+This toolkit consists of five Bash scripts designed to monitor system health, inspect packages, and parse system logs. 
 
 ### Prerequisites
-- A Linux environment (Ubuntu, Debian, Fedora, or WSL).
-- `git` and standard GNU core utilities installed.
+- A Linux-based environment (Ubuntu, Debian, Fedora, or WSL).
+- Standard GNU core utilities.
+- Execute permissions on the scripts.
 
-### Step-by-Step Setup
-**1. Clone the environment:**
+To make all scripts executable at once, run:
 ```bash
-git clone [https://github.com/Ayush-kathil/oss-audit-24BAI10220.git](https://github.com/Ayush-kathil/oss-audit-24BAI10220.git)
-cd oss-audit-24BAI10220
+chmod +x Scripts/*.sh
+```
+
+---
+
+### 1️⃣ System Reconnaissance (`script1.sh`)
+Acts as a system fingerprinting tool. It makes system calls to fetch the Linux kernel version, distribution release data, hostname, uptime, and current user metrics. This is crucial for establishing the base environment parameters.
+
+**Execution Command:**
+```bash
+./Scripts/script1.sh
+```
+
+### 2️⃣ FOSS Package Inspector (`script2.sh`)
+Uses package manager commands (`dpkg`) to verify the installation of Git on the host machine. It automatically extracts the version number, installation status, and provides a philosophical note on the importance of the package.
+
+**Execution Command:**
+```bash
+./Scripts/script2.sh
+```
+
+### 3️⃣ Security & Resource Auditor (`script3.sh`)
+Iterates through critical Linux directories (like `/etc`, `/var/log`, `/home`) to read file permission strings, owner data, and disk usage metrics. It effectively audits directory permissions to ensure that the environment is structurally sound.
+
+**Execution Command:**
+```bash
+./Scripts/script3.sh
+```
+
+### 4️⃣ Automated Log Parsing (`script4.sh`)
+Scans deep into provided system log files, filtering out the noise to find critical keywords (like "error" or "failed"). It demonstrates how administrators handle system-level error tracking in an open-source OS.
+
+**Execution Command:**
+*Note: You must provide a log file as an argument. A keyword is optional (defaults to "error").*
+```bash
+./Scripts/script4.sh /var/log/syslog
+# OR with a custom keyword:
+./Scripts/script4.sh /var/log/syslog "failed"
+```
+
+### 5️⃣ The OSS Philosophy Generator (`script5.sh`)
+An interactive I/O script that prompts the user for their thoughts on open source. It captures the answers and outputs them into a formalized, timestamped text file, generating a persistent `manifesto_<username>.txt`.
+
+**Execution Command:**
+```bash
+./Scripts/script5.sh
+```
+
+---
+
+## ⚖️ The Chosen Software: Git (GPL v2)
+Git, created by Linus Torvalds, is the distributed version control system that acts as the bedrock of modern open-source collaboration. Unlike decentralized models, it provides high performance, complete local history, and data integrity. Distributed under the GNU General Public License v2 (GPLv2), it embodies the core freedoms of open-source software—allowing developers to freely study, modify, and distribute the source code.
